@@ -1,0 +1,684 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Viste al Rover</title>
+<meta name="description" content="Juego para repasar el uniforme oficial del Rover, sus insignias y el significado de la pañoleta y el nudo. Asociación de Scouts de Guatemala.">
+<meta name="theme-color" content="#1C2C4C">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%23C62334'/%3E%3Cpath d='M12 4c-1.2 1.8-1.9 3.4-1.5 5.6.2 1.1.7 1.9 1.5 2.5.8-.6 1.3-1.4 1.5-2.5.4-2.2-.3-3.8-1.5-5.6Zm-4.5 5.2c-1.3 0-2.2 1-2.2 2.2 0 1.4 1.2 2.2 2.6 2.2h1.8c-1.2-.7-1.7-1.6-1.6-2.5 0-.7.3-1.3.8-1.6-.4-.2-.9-.3-1.4-.3Zm9 0c-.5 0-1 .1-1.4.3.5.3.8.9.8 1.6.1.9-.4 1.8-1.6 2.5h1.8c1.4 0 2.6-.8 2.6-2.2 0-1.2-.9-2.2-2.2-2.2ZM8.2 15v1.2h7.6V15Zm3 2v3h1.6v-3Z' fill='%23E9B949'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@600;700&family=Public+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: una sola columna tipo app de teléfono; el maniquí arriba, las fichas-parche abajo */
+:root{
+  --bg:#F3EEE4; --surface:#FFFDF8; --stage:#E2EBF2; --ink:#16233A; --muted:#5E6878; --line:#DDD3C2; --line-2:#C9BDA8;
+  --rover:#C62334; --rover-2:#951525; --rover-ink:#FFFFFF; --ok:#1E7F4A; --ok-bg:#E2F3E8; --bad:#C4470F; --bad-bg:#FBE9DD;
+  --manq:#B9C6D4; --manq-line:#97A6B7;
+  --shirt:#4F93CF; --shirt-dark:#326FA6; --navy:#1C2C4C; --navy-2:#2A3D63; --red:#C62334; --gold:#E9B949; --green:#2F7D4F; --wood:#8A5A2B; --black:#151515; --silver:#C9CED6;
+  --cream:#FFF7E6;
+  --f-display:"Zilla Slab", Georgia, serif;
+  --f-body:"Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0F1724; --surface:#182334; --stage:#1E2C40; --ink:#ECF1F6; --muted:#98A6B8; --line:#2D3C52; --line-2:#3B4D68;
+  --rover:#E04452; --rover-2:#A3202E; --ok:#4CC383; --ok-bg:#15301F; --bad:#F08A50; --bad-bg:#3A2216;
+  --manq:#3E4C5E; --manq-line:#5A6A7E; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0F1724; --surface:#182334; --stage:#1E2C40; --ink:#ECF1F6; --muted:#98A6B8; --line:#2D3C52; --line-2:#3B4D68;
+  --rover:#E04452; --rover-2:#A3202E; --ok:#4CC383; --ok-bg:#15301F; --bad:#F08A50; --bad-bg:#3A2216;
+  --manq:#3E4C5E; --manq-line:#5A6A7E; color-scheme:dark }
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{min-height:100%}
+body{margin:0;background-color:var(--bg);
+  background-image:repeating-linear-gradient(45deg, color-mix(in srgb, var(--ink) 3%, transparent) 0 1px, transparent 1px 7px);
+  color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5;-webkit-tap-highlight-color:transparent;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-top:max(12px,env(safe-area-inset-top,0px));padding-bottom:max(32px,env(safe-area-inset-bottom,0px))}
+.app{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.screen{display:flex;flex-direction:column;gap:14px;animation:enter .4s cubic-bezier(.2,.8,.2,1)}
+@keyframes enter{from{opacity:0;transform:translateY(12px)}}
+h1,h2,h3{font-family:var(--f-display);line-height:1.1;margin:0;text-wrap:balance}
+h1{font-size:2.8rem}
+h2{font-size:1.7rem}
+h3{font-size:1.2rem}
+p{margin:0}
+.muted{color:var(--muted)}
+.eyebrow{font-size:.75rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--rover)}
+.ref{font-family:var(--f-mono);font-size:.72rem;color:var(--muted)}
+
+/* ---------- Botones ---------- */
+.btn{appearance:none;border:0;border-radius:14px;padding:15px 18px;font:800 1.05rem var(--f-body);letter-spacing:.01em;cursor:pointer;
+  background:var(--rover);color:var(--rover-ink);width:100%;box-shadow:0 5px 0 var(--rover-2);transition:transform .08s, box-shadow .08s, opacity .2s;margin-bottom:5px}
+.btn:active:not(:disabled){transform:translateY(4px);box-shadow:0 1px 0 var(--rover-2)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn.ghost{background:var(--surface);color:var(--ink);box-shadow:0 5px 0 var(--line-2);border:2px solid var(--line-2)}
+.btn.ghost:active{box-shadow:0 1px 0 var(--line-2)}
+.btn:focus-visible,.patch:focus-visible,.opt:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+
+/* ---------- Inicio ---------- */
+.hero{position:relative;border-radius:26px;background:radial-gradient(120% 80% at 50% 0%, #2B4878 0%, var(--navy) 60%);color:var(--cream);
+  padding:24px 20px 0;overflow:hidden;text-align:center;box-shadow:0 10px 30px -12px rgba(16,28,52,.6)}
+.hero::before{content:"";position:absolute;inset:8px;border:2px dashed rgba(233,185,73,.6);border-radius:20px;pointer-events:none}
+.hero .eyebrow{color:var(--gold)}
+.hero h1{font-size:3rem;margin-top:6px;color:var(--cream);text-shadow:0 3px 0 rgba(0,0,0,.25)}
+.hero h1 span{color:#FF7B86}
+.hero p.lead{color:#C9D5E6;font-size:.95rem;margin:8px auto 0;max-width:34ch}
+.hero .fig-wrap{position:relative;margin-top:10px;height:230px;display:flex;justify-content:center;align-items:flex-end}
+.hero .fig-wrap::after{content:"";position:absolute;bottom:-26px;left:50%;width:220px;height:60px;transform:translateX(-50%);border-radius:50%;background:rgba(233,185,73,.18)}
+.hero .fig-wrap svg{height:230px;width:auto;position:relative;z-index:1}
+.hero .side{display:none}
+.hero .fig{--manq:#8FA0B5;--manq-line:#6E7F95}
+.hero .sparkle{position:absolute;color:var(--gold);opacity:.8;animation:twinkle 2.4s ease-in-out infinite}
+@keyframes twinkle{50%{opacity:.2;transform:scale(.7)}}
+
+.rounds{display:flex;flex-direction:column;gap:10px;margin:0;padding:0;list-style:none}
+.rounds li{display:flex;gap:14px;align-items:center;background:var(--surface);border:2px solid var(--line);border-radius:16px;padding:12px 14px;box-shadow:0 3px 0 var(--line)}
+.medal{flex:none;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font:700 1.3rem var(--f-display);color:#fff;outline:2px dashed rgba(255,255,255,.7);outline-offset:-5px}
+.m1{background:var(--rover)} .m2{background:#D19A1E} .m3{background:var(--green)}
+.rounds li span{font-size:.92rem;line-height:1.35}
+.rounds li strong{display:block;font-family:var(--f-display);font-size:1.1rem}
+.field{display:flex;flex-direction:column;gap:6px}
+label{font-weight:700;font-size:.9rem}
+input[type=text]{width:100%;font:600 1.05rem var(--f-body);padding:14px 16px;border-radius:14px;border:2px solid var(--line-2);background:var(--surface);color:var(--ink)}
+input[type=text]:focus{outline:3px solid var(--gold);outline-offset:1px}
+.note{font-size:.82rem;text-align:center}
+
+/* ---------- Barra de ronda ---------- */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.chip{display:inline-block;font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:3px 10px;border-radius:999px;color:#fff;margin-bottom:4px}
+.score{position:relative;display:inline-flex;align-items:center;gap:6px;font-family:var(--f-display);font-weight:700;font-size:1.15rem;background:var(--surface);border:2px solid var(--line-2);border-radius:999px;padding:5px 14px 5px 10px;font-variant-numeric:tabular-nums;box-shadow:0 3px 0 var(--line-2);white-space:nowrap}
+.score svg{width:20px;height:20px}
+.score.bump{animation:bump .35s}
+@keyframes bump{40%{transform:scale(1.15)}}
+.delta{position:absolute;right:6px;top:-6px;font:800 .95rem var(--f-body);pointer-events:none;animation:floatUp .9s ease-out forwards}
+.delta.plus{color:var(--ok)} .delta.minus{color:var(--bad)}
+@keyframes floatUp{to{opacity:0;transform:translateY(-26px)}}
+.bar{height:12px;background:var(--line);border-radius:999px;overflow:hidden;box-shadow:inset 0 2px 0 rgba(0,0,0,.06)}
+.bar i{display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,var(--rover),var(--gold));transition:width .45s cubic-bezier(.2,.8,.2,1)}
+.hint{font-size:.92rem}
+.count{display:inline-block;font-weight:800;color:var(--ink);background:var(--surface);border:1.5px solid var(--line-2);border-radius:8px;padding:0 7px;margin-left:4px;font-variant-numeric:tabular-nums}
+
+/* ---------- Escenario y maniquí ---------- */
+.stage{position:relative;border-radius:22px;padding:10px;display:flex;justify-content:center;
+  background:radial-gradient(90% 70% at 50% 35%, color-mix(in srgb, var(--surface) 70%, var(--stage)) 0%, var(--stage) 75%);border:2px solid var(--line)}
+.stage svg{width:100%;max-width:240px;height:auto;display:block}
+#fig2 svg{max-width:200px}
+.fig .layer{opacity:0;transition:opacity .35s ease, transform .45s cubic-bezier(.3,1.5,.5,1);transform:translateY(-8px)}
+.fig .layer.on{opacity:1;transform:none}
+.fig .zone{fill:transparent;stroke:transparent;stroke-width:2.2;stroke-dasharray:4 3}
+.fig .zone.hit{fill:color-mix(in srgb, var(--gold) 30%, transparent);stroke:var(--gold);animation:pulse 1s ease-in-out 2}
+@keyframes pulse{50%{stroke-width:4}}
+.fig .side{font:700 8px var(--f-body);fill:var(--muted);letter-spacing:.06em}
+.fig .placed{transform-box:fill-box;transform-origin:center;animation:pop .45s cubic-bezier(.3,1.6,.5,1)}
+@keyframes pop{from{opacity:0;transform:scale(.2)}}
+
+/* ---------- Fichas tipo parche bordado ---------- */
+.tray{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.patch{position:relative;text-align:left;border:2px solid var(--line-2);border-radius:14px;padding:12px 10px 12px 12px;background:var(--surface);color:var(--ink);cursor:pointer;
+  font:700 .95rem var(--f-body);outline:1.5px dashed var(--line-2);outline-offset:-7px;min-height:72px;
+  display:grid;grid-template-columns:auto 1fr;gap:1px 10px;align-content:start;box-shadow:0 4px 0 var(--line-2);transition:transform .08s, box-shadow .08s}
+.patch:active:not(.done):not(.wrong){transform:translateY(3px);box-shadow:0 1px 0 var(--line-2)}
+.patch .sw{grid-row:span 2;width:22px;height:22px;border-radius:50%;margin-top:1px;box-shadow:inset 0 0 0 2px color-mix(in srgb, var(--ink) 22%, transparent)}
+.patch small{font-weight:500;color:var(--muted);font-size:.78rem;line-height:1.3}
+.patch.done{background:var(--ok-bg);border-color:var(--ok);outline-color:var(--ok);box-shadow:0 2px 0 var(--ok);cursor:default}
+.patch.done::after,.patch.wrong::after{position:absolute;top:-8px;right:-6px;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;color:#fff;font:800 .8rem var(--f-body);animation:pop .35s}
+.patch.done::after{content:"✓";background:var(--ok)}
+.patch.wrong{background:var(--bad-bg);border-color:var(--bad);outline-color:var(--bad);box-shadow:0 2px 0 var(--bad);cursor:default;opacity:.8}
+.patch.wrong::after{content:"✕";background:var(--bad)}
+.patch.wrong > span{text-decoration:line-through;text-decoration-color:var(--bad)}
+.patch.off{opacity:.45;cursor:default}
+.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+/* ---------- Tarjetas, retroalimentación, opciones ---------- */
+.card{background:var(--surface);border:2px solid var(--line);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px;box-shadow:0 3px 0 var(--line)}
+.feedback{border-radius:14px;padding:12px 14px;display:grid;grid-template-columns:auto 1fr;gap:2px 12px;align-items:start;font-size:.95rem;animation:enter .3s cubic-bezier(.2,.8,.2,1)}
+.feedback .ic{grid-row:span 3;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:800;margin-top:2px}
+.feedback.ok{background:var(--ok-bg);border:2px solid var(--ok)} .feedback.ok .ic{background:var(--ok)}
+.feedback.bad{background:var(--bad-bg);border:2px solid var(--bad)} .feedback.bad .ic{background:var(--bad)}
+.feedback b{font-family:var(--f-display);font-size:1.1rem}
+
+.badge{display:flex;gap:14px;align-items:center}
+.badge .emb{flex:none;width:68px;height:68px;border-radius:14px;background:var(--navy);display:grid;place-items:center;outline:2px dashed var(--gold);outline-offset:-6px;box-shadow:0 4px 0 #0B1528;animation:pop .4s cubic-bezier(.3,1.6,.5,1)}
+.badge .emb svg{width:38px;height:38px}
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.opts.one{grid-template-columns:1fr}
+.opt{appearance:none;text-align:left;border:2px solid var(--line-2);background:var(--surface);color:var(--ink);border-radius:14px;padding:12px;font:600 .95rem var(--f-body);cursor:pointer;
+  box-shadow:0 4px 0 var(--line-2);transition:transform .08s, box-shadow .08s;display:flex;gap:10px;align-items:center}
+.opt:active:not(:disabled){transform:translateY(3px);box-shadow:0 1px 0 var(--line-2)}
+.opt .k{flex:none;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:var(--bg);border:1.5px solid var(--line-2);font:800 .85rem var(--f-body);color:var(--muted)}
+.opt.right{border-color:var(--ok);background:var(--ok-bg);box-shadow:0 2px 0 var(--ok);font-weight:700}
+.opt.right .k{background:var(--ok);border-color:var(--ok);color:#fff}
+.opt.no{border-color:var(--bad);background:var(--bad-bg);box-shadow:0 2px 0 var(--bad)}
+.opt.no .k{background:var(--bad);border-color:var(--bad);color:#fff}
+.opt:disabled{cursor:default}
+.opt:disabled:not(.right):not(.no){opacity:.5}
+.qcard{background:linear-gradient(160deg,#2B4878,var(--navy));color:var(--cream);border:0;box-shadow:0 4px 0 #0B1528;position:relative;overflow:hidden}
+.qcard::before{content:"";position:absolute;inset:6px;border:1.5px dashed rgba(233,185,73,.55);border-radius:13px;pointer-events:none}
+.qcard .ref{color:var(--gold)}
+.qcard h3{font-size:1.3rem}
+
+/* ---------- Resultado ---------- */
+.result{align-items:center;text-align:center}
+.trophy{width:130px;height:auto;animation:pop .6s cubic-bezier(.3,1.6,.5,1)}
+.stars{display:flex;gap:6px;justify-content:center}
+.stars svg{width:34px;height:34px}
+.stars .on{animation:pop .4s cubic-bezier(.3,1.6,.5,1) both}
+.final{font-family:var(--f-display);font-size:4.4rem;line-height:1;font-variant-numeric:tabular-nums}
+.break{display:flex;flex-direction:column;gap:10px;width:100%;text-align:left}
+.break .row-b{display:grid;grid-template-columns:1fr auto;gap:4px 10px;font-size:.92rem;font-variant-numeric:tabular-nums}
+.break .bar{grid-column:1/-1;height:8px}
+.guide h3{margin-top:2px}
+.guide ul{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:8px}
+.guide li span.ref{display:block}
+.row{display:flex;gap:10px}
+.row > *{flex:1}
+.confetti{position:fixed;top:-12px;width:9px;height:14px;border-radius:2px;pointer-events:none;z-index:10;animation:fall linear forwards}
+@keyframes fall{to{transform:translate(var(--dx),110vh) rotate(var(--r))}}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .fig .layer{transform:none}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- INICIO -->
+  <section id="s-home" class="screen">
+    <div class="hero">
+      <p class="eyebrow">Cartilla de Heraldo · Conocimiento del Escultismo</p>
+      <h1>Viste al <span>Rover</span></h1>
+      <p class="lead">Repasa lo que vimos en la charla: el uniforme oficial, sus insignias y el significado de la pañoleta y el nudo.</p>
+      <svg class="sparkle" style="left:26px;top:120px;width:14px" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.5 9.5L24 12l-9.5 2.5L12 24l-2.5-9.5L0 12l9.5-2.5Z"/></svg>
+      <svg class="sparkle" style="right:30px;top:160px;width:10px;animation-delay:.8s" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.5 9.5L24 12l-9.5 2.5L12 24l-2.5-9.5L0 12l9.5-2.5Z"/></svg>
+      <svg class="sparkle" style="right:56px;top:250px;width:12px;animation-delay:1.5s" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2.5 9.5L24 12l-9.5 2.5L12 24l-2.5-9.5L0 12l9.5-2.5Z"/></svg>
+      <div class="fig-wrap" id="figHero"></div>
+    </div>
+    <ol class="rounds">
+      <li><span class="medal m1">1</span><span><strong>Arma el uniforme</strong>Escoge solo las prendas del Rover. Cada error resta puntos.</span></li>
+      <li><span class="medal m2">2</span><span><strong>¿Dónde va?</strong>Coloca cada insignia en su lugar del uniforme.</span></li>
+      <li><span class="medal m3">3</span><span><strong>Pañoleta y nudo</strong>Qué significan y cómo se usan.</span></li>
+    </ol>
+    <div class="field">
+      <label for="name">Tu nombre</label>
+      <input type="text" id="name" placeholder="Ej. Luis" autocomplete="given-name" maxlength="30">
+    </div>
+    <button class="btn" id="start">¡Empezar!</button>
+    <button class="btn ghost" id="openGuide">Ver la guía rápida</button>
+    <p class="note muted">Basado en el Reglamento para el uso del uniforme scout de la ASG y en <i>Escultismo para Muchachos</i>.</p>
+  </section>
+
+  <!-- RONDA 1 -->
+  <section id="s-r1" class="screen" hidden>
+    <div class="top"><div><span class="chip m1">Ronda 1 de 3</span><h2>Arma el uniforme</h2></div><span class="score" data-score>0</span></div>
+    <div class="bar"><i id="bar1"></i></div>
+    <p class="muted hint">Toca las prendas del uniforme de <strong>Rover</strong>. Algunas son de otras secciones o no están permitidas. <span class="count" id="count1">0/9</span></p>
+    <div class="stage" id="fig1"></div>
+    <div id="fb1"></div>
+    <div class="tray" id="tray"></div>
+    <button class="btn" id="next1" disabled>Siguiente ronda</button>
+  </section>
+
+  <!-- RONDA 2 -->
+  <section id="s-r2" class="screen" hidden>
+    <div class="top"><div><span class="chip m2">Ronda 2 de 3</span><h2>¿Dónde va?</h2></div><span class="score" data-score>0</span></div>
+    <div class="bar"><i id="bar2"></i></div>
+    <div class="card">
+      <div class="badge"><div class="emb" id="emb"></div><div><p class="ref" id="r2n"></p><h3 id="r2t"></h3><p class="muted" id="r2d" style="font-size:.9rem"></p></div></div>
+    </div>
+    <p class="muted" style="font-size:.85rem">Derecha e izquierda son las de quien lleva puesto el uniforme. Tienes dos intentos.</p>
+    <div class="stage" id="fig2"></div>
+    <div id="fb2"></div>
+    <div class="opts" id="zones"></div>
+    <button class="btn" id="next2" hidden>Siguiente</button>
+  </section>
+
+  <!-- RONDA 3 -->
+  <section id="s-r3" class="screen" hidden>
+    <div class="top"><div><span class="chip m3">Ronda 3 de 3</span><h2>Pañoleta y nudo</h2></div><span class="score" data-score>0</span></div>
+    <div class="bar"><i id="bar3"></i></div>
+    <div class="card qcard"><p class="ref" id="r3n"></p><h3 id="r3q"></h3></div>
+    <div class="opts one" id="qopts"></div>
+    <div id="fb3"></div>
+    <button class="btn" id="next3" hidden>Siguiente</button>
+  </section>
+
+  <!-- FINAL -->
+  <section id="s-end" class="screen" hidden>
+    <div class="card result">
+      <p class="eyebrow">Resultado</p>
+      <svg class="trophy" viewBox="0 0 120 150" aria-hidden="true">
+        <path d="M34 0 H58 L48 60 H24 Z" fill="var(--red)"/><path d="M86 0 H62 L72 60 H96 Z" fill="var(--navy-2)"/>
+        <circle cx="60" cy="98" r="46" fill="#C9951F"/><circle cx="60" cy="96" r="44" fill="var(--gold)"/>
+        <circle cx="60" cy="96" r="35" fill="none" stroke="#B9851A" stroke-width="2" stroke-dasharray="4 3"/>
+        <g transform="translate(36 72) scale(2)" fill="var(--navy)"><path d="M12 2c-1.6 2.4-2.6 4.6-2 7.6.3 1.5 1 2.6 2 3.4 1-.8 1.7-1.9 2-3.4.6-3-.4-5.2-2-7.6Zm-6 7c-1.8 0-3 1.4-3 3 0 1.9 1.6 3 3.5 3H9c-1.6-.9-2.3-2.1-2.2-3.4 0-.9.4-1.7 1.1-2.2C7.3 9.1 6.7 9 6 9Zm12 0c-.7 0-1.3.1-1.9.4.7.5 1.1 1.3 1.1 2.2.1 1.3-.6 2.5-2.2 3.4h2.5c1.9 0 3.5-1.1 3.5-3 0-1.6-1.2-3-3-3ZM7 16v1.6h10V16Zm4 2.6v3.4h2v-3.4Z"/></g>
+      </svg>
+      <h2 id="endName"></h2>
+      <div class="stars" id="stars"></div>
+      <span class="final" id="endScore">0</span>
+      <p class="muted" style="margin-top:-6px">de 300 puntos posibles</p>
+      <p id="endTitle" style="font-family:var(--f-display);font-size:1.4rem;font-weight:700;color:var(--rover)"></p>
+      <div class="break">
+        <div class="row-b"><span>Ronda 1 · Arma el uniforme</span><strong id="b1"></strong><div class="bar"><i id="bb1"></i></div></div>
+        <div class="row-b"><span>Ronda 2 · ¿Dónde va?</span><strong id="b2"></strong><div class="bar"><i id="bb2"></i></div></div>
+        <div class="row-b"><span>Ronda 3 · Pañoleta y nudo</span><strong id="b3"></strong><div class="bar"><i id="bb3"></i></div></div>
+      </div>
+    </div>
+    <div class="row"><button class="btn" id="again">Jugar otra vez</button><button class="btn ghost" id="guideEnd">Guía rápida</button></div>
+  </section>
+
+  <!-- GUÍA -->
+  <section id="s-guide" class="screen guide" hidden>
+    <div class="top"><h2>Guía rápida</h2><button class="btn ghost" id="closeGuide" style="width:auto;padding:8px 16px;margin:0">Volver</button></div>
+    <div class="card">
+      <h3>Un poco de historia</h3>
+      <p>Baden-Powell tomó el uniforme de los alguaciles que tuvo a su mando en África del Sur, porque era cómodo, útil y protegía del clima. Con pocos cambios lo adoptaron los scouts de todo el mundo.</p>
+      <p>B-P quería un uniforme para <strong>borrar las diferencias sociales</strong>: con él, todos los scouts son iguales, sin importar su origen. Por eso expresa compañerismo, unidad y hermandad. Según el reglamento de la ASG, además identifica, da sentido de pertenencia y muestra que quien lo usa está preparado para servir.</p>
+      <span class="ref">Escultismo para Muchachos · Reglamento ASG, Introducción · scouts.org.gt</span>
+    </div>
+    <div class="card">
+      <h3>Prendas del uniforme de Rover</h3>
+      <ul id="gPieces"></ul>
+    </div>
+    <div class="card">
+      <h3>Dónde va cada insignia</h3>
+      <ul id="gBadges"></ul>
+    </div>
+    <div class="card">
+      <h3>La pañoleta y el nudo</h3>
+      <ul>
+        <li>Es triangular, se enrolla por el lado más largo y se pone al cuello con el triángulo atrás y las puntas al frente.<span class="ref">Art. 3° f</span></li>
+        <li>Lleva los colores del grupo y tiene un significado especial para sus miembros. Representa el honor del grupo, por eso se respeta la propia y la ajena, y se mantiene limpia y arreglada.<span class="ref">Art. 3° f · Escultismo para Muchachos</span></li>
+        <li>La Jefatura Scout Nacional aprueba el diseño. No puede repetirse; si dos grupos tienen el mismo, gana el más antiguo.<span class="ref">Art. 3° f</span></li>
+        <li>Se fija con un nudo cabeza de turco o un anillo tallado de madera, hueso u otro material no tóxico. No se anuda a sí misma (solo los Cachorros, con nudo rizo).<span class="ref">Art. 3° f</span></li>
+        <li>El nudo de cuero de Gilwell es solo para scouters con Insignia de Madera o el módulo III aprobado.<span class="ref">Art. 3° f · Art. 9° f</span></li>
+        <li>B-P pedía hacer un nudo en la pañoleta cada mañana para recordar la buena acción del día.<span class="ref">Escultismo para Muchachos</span></li>
+        <li>La insignia scout también tiene un nudo: el cordón que cuelga bajo la flor de lis termina en un nudo que recuerda la buena acción diaria.<span class="ref">Escultismo para Muchachos</span></li>
+        <li>También sirve en emergencias: protege el cuello del sol y se usa como vendaje, cabestrillo o cuerda de salvamento.<span class="ref">Escultismo para Muchachos</span></li>
+      </ul>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+const $ = s => document.querySelector(s);
+const shuffle = a => { a = a.slice(); for (let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
+const reduced = () => window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+const buzz = ms => { try{ navigator.vibrate && navigator.vibrate(ms) }catch(e){} };
+
+/* ---------- Maniquí SVG ---------- */
+function figure(){
+  return `<svg class="fig" viewBox="0 0 200 380" role="img" aria-label="Maniquí con el uniforme de Rover">
+  <text class="side" x="8" y="14">SU DERECHA</text><text class="side" x="192" y="14" text-anchor="end">SU IZQUIERDA</text>
+  <g fill="var(--manq)" stroke="var(--manq-line)" stroke-width="1.2">
+    <circle cx="100" cy="50" r="21"/>
+    <rect x="92" y="68" width="16" height="14" rx="3"/>
+    <path d="M64 86 L44 100 L36 190 L48 192 L56 118 L66 112 Z"/>
+    <path d="M136 86 L156 100 L164 190 L152 192 L144 118 L134 112 Z"/>
+    <circle cx="42" cy="198" r="7"/><circle cx="158" cy="198" r="7"/>
+    <rect x="68" y="190" width="28" height="160" rx="7"/>
+    <rect x="104" y="190" width="28" height="160" rx="7"/>
+    <path d="M64 86 Q100 76 136 86 L140 198 L60 198 Z"/>
+  </g>
+  <g class="layer" data-l="medias">
+    <rect x="68" y="290" width="28" height="56" fill="var(--navy)"/><rect x="104" y="290" width="28" height="56" fill="var(--navy)"/>
+    <rect x="68" y="290" width="28" height="9" fill="var(--navy-2)"/><rect x="104" y="290" width="28" height="9" fill="var(--navy-2)"/>
+  </g>
+  <g class="layer" data-l="borlas" fill="var(--red)">
+    <rect x="64" y="297" width="6" height="14" rx="1"/><rect x="130" y="297" width="6" height="14" rx="1"/>
+  </g>
+  <g class="layer" data-l="zapatos" fill="var(--black)">
+    <path d="M64 344 L96 344 L98 356 Q80 364 60 358 Z"/><path d="M104 344 L136 344 L140 358 Q120 364 102 356 Z"/>
+  </g>
+  <g class="layer" data-l="pantaloneta">
+    <path d="M60 194 L140 194 L143 260 L104 262 L100 226 L96 262 L57 260 Z" fill="var(--navy)"/>
+    <path d="M100 200 L100 226" stroke="var(--navy-2)" stroke-width="1.5"/>
+  </g>
+  <g class="layer" data-l="camisa">
+    <path d="M64 86 Q100 76 136 86 L140 198 L60 198 Z" fill="var(--shirt)"/>
+    <path d="M64 86 L44 100 L39 142 L58 144 L62 118 Z" fill="var(--shirt)"/>
+    <path d="M136 86 L156 100 L161 142 L142 144 L138 118 Z" fill="var(--shirt)"/>
+    <path d="M39.5 136 L58.5 138 L58 144 L39 142 Z M160.5 136 L141.5 138 L142 144 L161 142 Z" fill="var(--shirt-dark)"/>
+    <g fill="none" stroke="var(--shirt-dark)" stroke-width="1.4">
+      <rect x="71" y="112" width="20" height="22" rx="2"/><path d="M71 118 L91 118"/>
+      <rect x="109" y="112" width="20" height="22" rx="2"/><path d="M109 118 L129 118"/>
+      <path d="M100 86 L100 196"/>
+    </g>
+    <path d="M90 78 L100 88 L110 78 L108 76 L100 84 L92 76 Z" fill="var(--shirt-dark)"/>
+  </g>
+  <g class="layer" data-l="cincho">
+    <rect x="60" y="190" width="80" height="8" fill="var(--black)"/>
+    <rect x="94" y="188.5" width="12" height="11" rx="1.5" fill="var(--silver)" stroke="var(--black)" stroke-width="1"/>
+  </g>
+  <g class="layer" data-l="charreteras" fill="var(--red)">
+    <path d="M66 88 L88 81 L90 87 L68 94 Z"/><path d="M134 88 L112 81 L110 87 L132 94 Z"/>
+  </g>
+  <g class="layer" data-l="panoleta">
+    <path d="M84 74 Q100 86 116 74 L119 81 Q100 95 81 81 Z" fill="var(--gold)" stroke="var(--green)" stroke-width="1.5"/>
+    <path d="M85 81 L99 104 L97 150 L90 148 L94 108 Z" fill="var(--gold)" stroke="var(--green)" stroke-width="1.5"/>
+    <path d="M115 81 L101 104 L103 150 L110 148 L106 108 Z" fill="var(--gold)" stroke="var(--green)" stroke-width="1.5"/>
+    <rect x="94" y="99" width="12" height="12" rx="3.5" fill="var(--wood)"/>
+    <path d="M95 103 L105 103 M95 107 L105 107" stroke="var(--gold)" stroke-width="1"/>
+  </g>
+  <g class="layer" data-l="gorra">
+    <path d="M78 42 Q80 18 100 17 Q120 18 122 42 Z" fill="var(--red)"/>
+    <path d="M77 41 L132 41 Q137 45 130 48 L77 47 Z" fill="var(--red)" stroke="var(--black)" stroke-opacity=".25"/>
+    <path d="M100 30.5 L100 26 M100 26.5 L96.5 21 M100 26.5 L103.5 21" stroke="#8A5A2B" stroke-width="2" stroke-linecap="round" fill="none"/>
+    <text x="100" y="37.5" text-anchor="middle" font-size="6.5" font-weight="800" fill="#FFFFFF" font-family="Public Sans, sans-serif">ROVER</text>
+    <text x="104" y="45.6" text-anchor="middle" font-size="3.6" font-weight="700" fill="#FFFFFF" font-family="Public Sans, sans-serif" letter-spacing=".3">GUATEMALA</text>
+  </g>
+  <g>
+    <rect class="zone" data-z="gorra" x="74" y="12" width="62" height="40" rx="6"/>
+    <rect class="zone" data-z="mangaDer" x="34" y="94" width="30" height="54" rx="6"/>
+    <rect class="zone" data-z="mangaIzq" x="136" y="94" width="30" height="54" rx="6"/>
+    <rect class="zone" data-z="bolsaDer" x="67" y="100" width="28" height="38" rx="5"/>
+    <rect class="zone" data-z="bolsaIzq" x="105" y="100" width="28" height="38" rx="5"/>
+    <rect class="zone" data-z="charDer" x="62" y="76" width="31" height="22" rx="5"/>
+    <rect class="zone" data-z="charIzq" x="107" y="76" width="31" height="22" rx="5"/>
+  </g>
+  <g class="placed-layer"></g>
+</svg>`;
+}
+
+/* ---------- Datos ---------- */
+// c = color de la muestra en la ficha. Todas llevan una descripción para que ninguna se descarte "por lógica".
+const PIECES = [
+  {id:'gorra', n:'Gorra roja', s:'con horquilla café y letras ROVER', c:'#C62334', ok:true, why:'Los Rovers usan gorra roja con una horquilla café y las letras ROVER y Guatemala en blanco, o boina roja con la flor de lis nacional bordada en amarillo.', ref:'Art. 3° h'},
+  {id:'panoleta', n:'Pañoleta de grupo', s:'enrollada y con anillo', c:'linear-gradient(135deg,#E9B949 50%,#2F7D4F 50%)', ok:true, why:'Va enrollada por el lado más largo, con el triángulo atrás del cuello, fijada con un nudo cabeza de turco o un anillo.', ref:'Art. 3° f'},
+  {id:'camisa', n:'Camisa azul nacional', s:'cuello chino y dos bolsas', c:'#4F93CF', ok:true, why:'Manga corta o larga, cuello estilo chino, charreteras y dos bolsas de parche con tapa abotonada.', ref:'Art. 3° a'},
+  {id:'charreteras', n:'Charreteras rojas', s:'con flor de lis bordada', c:'#C62334', ok:true, why:'Las del Clan son rojas, van sobre las hombreras, con la flor de lis nacional bordada en el extremo y ojal abotonado. Ahí van las especialidades.', ref:'Art. 7° e'},
+  {id:'cincho', n:'Cincho negro', s:'de una pulgada, hebilla metálica', c:'#151515', ok:true, why:'De lona, cuero o similar, de una pulgada de ancho, con hebilla metálica.', ref:'Art. 3° g'},
+  {id:'pantaloneta', n:'Pantaloneta azul marino', s:'lisa, sin pliegues', c:'#1C2C4C', ok:true, why:'Corta o larga, azul marino, sin pliegues. Las damas también pueden usar falda-short azul marino.', ref:'Art. 3° b'},
+  {id:'medias', n:'Medias azul marino', s:'largas, sostenidas con ligas', c:'#1C2C4C', ok:true, why:'Medias largas color azul marino, sostenidas con ligas.', ref:'Art. 3° c'},
+  {id:'borlas', n:'Borlas rojas', s:'asoman por el doblez de la media', c:'#C62334', ok:true, why:'Asoman por el doblez de la media, atadas a las ligas. Cada sección tiene su color y el del Clan es rojo.', ref:'Art. 3° d'},
+  {id:'zapatos', n:'Zapatos negros', s:'de cuero, tacón bajo', c:'#151515', ok:true, why:'De cuero, negros, de tacón bajo y amarrados. Cuando la ocasión lo pide se permiten botas o tenis negros.', ref:'Art. 3° e'},
+  {id:'x-gorra', n:'Gorra azul marino', s:'con flor de lis al frente', c:'#1C2C4C', ok:false, why:'Esa es la de Scouts, Caminantes y Scouters. La del Rover es roja.', ref:'Art. 3° h'},
+  {id:'x-borlas', n:'Borlas azules', s:'asoman por el doblez de la media', c:'#2F6FD1', ok:false, why:'Las borlas azules son de Caminantes. El Clan usa borlas rojas.', ref:'Art. 3° d'},
+  {id:'x-lona', n:'Pantalón de lona', s:'azul oscuro, corte recto', c:'#3B5B8C', ok:false, why:'El reglamento prohíbe expresamente el pantalón de lona con el uniforme.', ref:'Art. 3° b'},
+  {id:'x-nudo', n:'Pañoleta anudada', s:'puntas amarradas con nudo rizo', c:'linear-gradient(135deg,#E9B949 50%,#2F7D4F 50%)', ok:false, why:'No se permite anudar la pañoleta a sí misma. Solo los Cachorros la amarran, con nudo rizo.', ref:'Art. 3° f'},
+  {id:'x-horquilla', n:'Horquilla Rover', s:'de madera, a la altura de la axila', c:'#8A5A2B', ok:false, why:'Sí es parte del uniforme Rover, pero se entrega en la tercera etapa de progresión. Un Heraldo todavía no la lleva.', ref:'Art. 7° e'},
+  {id:'x-tenis', n:'Tenis blancos', s:'deportivos, con cordones', c:'#FFFFFF', ok:false, why:'Los zapatos deben ser negros. Solo se aceptan botas o tenis si también son negros.', ref:'Art. 3° e'}
+];
+const ZONES = [
+  {z:'gorra', n:'Gorra'},
+  {z:'charDer', n:'Charretera derecha'},{z:'charIzq', n:'Charretera izquierda'},
+  {z:'mangaDer', n:'Manga derecha'},{z:'mangaIzq', n:'Manga izquierda'},
+  {z:'bolsaDer', n:'Bolsa derecha'},{z:'bolsaIzq', n:'Bolsa izquierda'}
+];
+const zName = z => ZONES.find(x=>x.z===z).n;
+// Dónde se dibuja cada insignia sobre el maniquí cuando se coloca: [x, y, tamaño]
+const SLOTS = {
+  gorra:[[118,22,10]],
+  charDer:[[71,80,11]], charIzq:[[118,80,11]],
+  mangaDer:[[45,101,13],[45,116,13]], mangaIzq:[[142,101,13],[142,116,13]],
+  bolsaDer:[[74,104,14],[74,120,13]], bolsaIzq:[[112,104,14],[112,120,13]]
+};
+const ICON = {
+  lis:'<svg viewBox="0 0 24 24" fill="var(--gold)"><path d="M12 2c-1.6 2.4-2.6 4.6-2 7.6.3 1.5 1 2.6 2 3.4 1-.8 1.7-1.9 2-3.4.6-3-.4-5.2-2-7.6Zm-6 7c-1.8 0-3 1.4-3 3 0 1.9 1.6 3 3.5 3H9c-1.6-.9-2.3-2.1-2.2-3.4 0-.9.4-1.7 1.1-2.2C7.3 9.1 6.7 9 6 9Zm12 0c-.7 0-1.3.1-1.9.4.7.5 1.1 1.3 1.1 2.2.1 1.3-.6 2.5-2.2 3.4h2.5c1.9 0 3.5-1.1 3.5-3 0-1.6-1.2-3-3-3ZM7 16v1.6h10V16Zm4 2.6v3.4h2v-3.4Z"/></svg>',
+  flag:'<svg viewBox="0 0 24 24"><rect x="2" y="6" width="6.7" height="12" fill="#5BB3E6"/><rect x="8.7" y="6" width="6.6" height="12" fill="#FFFFFF"/><rect x="15.3" y="6" width="6.7" height="12" fill="#5BB3E6"/><circle cx="12" cy="12" r="1.8" fill="#2F7D4F"/></svg>',
+  num:'<svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2" fill="#FFFFFF"/><text x="12" y="16" text-anchor="middle" font-size="9" font-weight="700" fill="#4A9BD3" font-family="Times New Roman,serif">00</text></svg>',
+  arc:'<svg viewBox="0 0 24 24" fill="none"><path d="M3 15 Q12 4 21 15" stroke="#FFFFFF" stroke-width="5"/><path d="M3 15 Q12 4 21 15" stroke="#5BB3E6" stroke-width="1.2" stroke-dasharray="1.5 1.5"/></svg>',
+  ribbons:'<svg viewBox="0 0 24 24"><rect x="4" y="3" width="3" height="18" fill="#7CC7EE"/><rect x="8.3" y="3" width="3" height="18" fill="#F2C94C"/><rect x="12.6" y="3" width="3" height="18" fill="#3BA55C"/><rect x="16.9" y="3" width="3" height="18" fill="#2F6FD1"/></svg>',
+  tri:'<svg viewBox="0 0 24 24"><path d="M12 3 L22 20 H2 Z" fill="#C62334"/><path d="M12 8 L17 17 H7 Z" fill="#E9B949"/></svg>',
+  star:'<svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.6 1.3 6.6L12 17.3 6.1 20.5l1.3-6.6L2.5 9.3l6.6-.8Z" fill="#E9B949"/></svg>',
+  circle:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FFFFFF"/><circle cx="12" cy="12" r="7" fill="#2F7D4F"/><path d="M12 7l1.5 3.2 3.4.4-2.5 2.4.6 3.4-3-1.7-3 1.7.6-3.4-2.5-2.4 3.4-.4Z" fill="#FFFFFF"/></svg>',
+  pin:'<svg viewBox="0 0 24 24"><circle cx="12" cy="10" r="7" fill="#C9CED6"/><circle cx="12" cy="10" r="4" fill="#C62334"/><rect x="11" y="16" width="2" height="6" fill="#C9CED6"/></svg>',
+  rect:'<svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="1.5" fill="#1C2C4C" stroke="#E9B949" stroke-width="1.5"/><path d="M12 8c-1 1.4-1.4 2.6-1 4 .2.6.5 1 1 1.4.5-.4.8-.8 1-1.4.4-1.4 0-2.6-1-4Z" fill="#E9B949"/></svg>',
+  purple:'<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" fill="#5B3A93"/><path d="M12 7c-1 1.5-1.6 2.8-1.2 4.6.2.9.6 1.5 1.2 2 .6-.5 1-1.1 1.2-2 .4-1.8-.2-3.1-1.2-4.6Z" fill="#FFFFFF"/></svg>'
+};
+// Solo las insignias del uniforme general. Las máximas (como Rover B-P) no las usa todo el Clan, así que no entran.
+const BADGES = [
+  {n:'Insignia de la Asociación', d:'Parche morado con la flor de lis blanca y la palabra "scouts".', z:'bolsaDer', i:'purple', why:'Va bordada en la camisa, sobre la bolsa derecha.', ref:'Art. 5° a'},
+  {n:'Insignia de región', d:'En forma de arco, letras celestes sobre fondo blanco.', z:'mangaDer', i:'arc', why:'Manga derecha, a 1 cm bajo la costura del hombro.', ref:'Art. 5° b'},
+  {n:'Número de grupo', d:'Números celestes sobre fondo blanco.', z:'mangaDer', i:'num', why:'Manga derecha, 2 cm debajo de la insignia de región.', ref:'Art. 5° c'},
+  {n:'Insignia de la Promesa', d:'Rectángulo azul marino con la flor de lis y un lazo con nudo rizo.', z:'bolsaIzq', i:'rect', why:'Se usa en la bolsa izquierda desde la ceremonia de Promesa, y se queda aunque cambies de sección.', ref:'Art. 5° d'},
+  {n:'Membresía del año', d:'La entrega la ASG cada año al registrarte.', z:'bolsaIzq', i:'star', why:'Va sobre la bolsa izquierda y se cambia cada año.', ref:'Art. 5° e'},
+  {n:'Bandera nacional', d:'Insignia con la bandera de Guatemala.', z:'mangaIzq', i:'flag', why:'Manga izquierda, a 1 cm debajo de la costura.', ref:'Art. 5° f'},
+  {n:'Cintas de Clan', d:'Listones de colores según tu etapa de progresión.', z:'mangaIzq', i:'ribbons', why:'Cuelgan de un gancho en la manga izquierda, a 1 cm de la costura del hombro.', ref:'Art. 7° e'},
+  {n:'Especialidad de Proyectos o Servicio', d:'Insignia de especialidad Rover.', z:'charDer', i:'tri', why:'Proyectos y Servicio van sobre la charretera derecha.', ref:'Art. 7° e'},
+  {n:'Especialidad de Expedición o Técnica Scout', d:'Insignia de especialidad Rover.', z:'charIzq', i:'tri', why:'Expedición y Técnica Scout van sobre la charretera izquierda.', ref:'Art. 7° e'},
+  {n:'Insignia de evento', d:'De un evento regional, nacional o internacional.', z:'bolsaDer', i:'circle', why:'Bolsa derecha, y solo una a la vez.', ref:'Art. 10° c–e'},
+  {n:'Pines', d:'Los que entrega la ASG en cursos, eventos o como reconocimiento.', z:'gorra', i:'pin', why:'Los pines van solo en la gorra. Nunca en la camisa, la pañoleta ni el pantalón.', ref:'Art. 10° h'}
+];
+// Las opciones tienen largos parecidos para que la correcta no se adivine por ser la más larga.
+const QUESTIONS = [
+  {q:'¿Cómo se coloca la pañoleta?', a:'Enrollada por el lado largo, con el triángulo atrás', w:['Doblada en cuadro, metida bajo el cuello de la camisa','Enrollada por el lado largo, con el triángulo al frente','Doblada en triángulo y amarrada con sus puntas'], why:'Así lo describe el reglamento: los lados caen al frente y el triángulo queda en la parte de atrás del cuello.', ref:'Reglamento ASG · Art. 3° f'},
+  {q:'Según el reglamento, ¿qué representa la pañoleta de grupo?', a:'El honor del grupo scout', w:['El rango del scout en su grupo','La etapa de progresión del Rover','La región a la que pertenece el grupo'], why:'Por ser símbolo del honor del grupo, se respeta siempre, tanto la propia como la ajena.', ref:'Reglamento ASG · Art. 3° f'},
+  {q:'¿Con qué se fija la pañoleta?', a:'Con un nudo cabeza de turco o un anillo', w:['Con un nudo rizo hecho con sus dos puntas','Con un imperdible prendido a la camisa','Con el botón superior de la camisa'], why:'El anillo puede ser tallado, labrado o pirograbado, de madera, hueso u otro material no tóxico, siempre que no sea peligroso.', ref:'Reglamento ASG · Art. 3° f'},
+  {q:'¿Un Rover puede anudar la pañoleta a sí misma?', a:'No, solo los Cachorros la anudan con nudo rizo', w:['Sí, siempre que use un nudo rizo bien hecho','Sí, pero únicamente durante los campamentos','Solo en las ceremonias de investidura del Clan'], why:'El reglamento no lo permite. La única excepción son los Cachorros.', ref:'Reglamento ASG · Art. 3° f'},
+  {q:'¿Quién aprueba el diseño de la pañoleta de un grupo?', a:'La Jefatura Scout Nacional', w:['El Jefe de Grupo','El Consejo de Grupo, por votación','La Comisión de su región'], why:'Y no puede ser igual a la de otro grupo. Si dos diseños coinciden, se le da prioridad al grupo más antiguo.', ref:'Reglamento ASG · Art. 3° f'},
+  {q:'En Escultismo para Muchachos, ¿para qué pide B-P hacer un nudo en la pañoleta cada mañana?', a:'Para recordar la buena acción del día', w:['Para contar los días de campamento','Para que la pañoleta no se resbale','Para repasar la Ley Scout cada día'], why:'B-P dice que el nudo en la pañoleta y en la insignia es un recordatorio de la buena acción diaria.', ref:'Escultismo para Muchachos'},
+  {q:'Según B-P, además de la pañoleta, ¿dónde hay otro nudo que recuerda la buena acción?', a:'En el cordón bajo la flor de lis de la insignia', w:['En el cordón del silbato del Guía de patrulla','En la agujeta que sostiene el sombrero','En las ligas que sostienen las medias'], why:'Bajo la flor de lis va una voluta con el lema, y de ella cuelga un cordón con un nudo en la punta para recordar la buena acción diaria.', ref:'Escultismo para Muchachos'},
+  {q:'Según B-P, ¿qué otro uso práctico tiene la pañoleta?', a:'Vendaje, cabestrillo o cuerda de salvamento', w:['Filtro para purificar el agua del río','Bandera para hacer señales de semáforo','Cinta para medir distancias en el campo'], why:'Además de proteger el cuello del sol, en primeros auxilios sirve para hacer un vendaje o un cabestrillo.', ref:'Escultismo para Muchachos'},
+  {q:'¿Quién puede usar el nudo de cuero (nudo de Gilwell)?', a:'Scouters con Insignia de Madera o módulo III', w:['Cualquier Rover que ya esté investido','Los Pilotos Rover mientras tengan el cargo','Quien haya tejido su propio anillo de cuero'], why:'Es un anillo de cuero tejido en cabeza de turco de dos vueltas, reservado para quienes tienen esa formación.', ref:'Reglamento ASG · Art. 3° f y 9° f'},
+  {q:'La pañoleta nacional (azul marino con franja blanca), ¿quién la usa?', a:'Autoridades nacionales y delegaciones oficiales', w:['Cualquier scout durante un evento nacional','Los Rovers que obtienen la insignia B-P','Todos los Jefes de Grupo del país'], why:'La usan el Consejo Scout Nacional, la Corte de Honor, la Jefatura y el Comité Técnico. Una delegación oficial solo mientras dura el evento; después vuelve a la pañoleta de grupo.', ref:'Reglamento ASG · Art. 10° i'}
+];
+const MAX = {r1: PIECES.filter(p=>p.ok).length*10, r2: BADGES.length*10, r3: QUESTIONS.length*10};
+const NEED = PIECES.filter(p=>p.ok).length;
+
+/* ---------- Estado ---------- */
+let S;
+function reset(){ S = {name:'', r1:0, r2:0, r3:0, placed:0, wrong1:0, bi:0, bTry:0, badges:shuffle(BADGES), qi:0, qs:shuffle(QUESTIONS), slot:{}}; }
+reset();
+const total = () => S.r1 + S.r2 + S.r3;
+const screens = ['home','r1','r2','r3','end','guide'];
+let back = 'home';
+function show(id){ screens.forEach(s => $('#s-'+s).hidden = s!==id); window.scrollTo(0,0); }
+
+function store(k,v){ try{ localStorage.setItem(k,v) }catch(e){} }
+function load(k){ try{ return localStorage.getItem(k) || '' }catch(e){ return '' } }
+$('#name').value = load('rover-name');
+
+const STAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.6 1.3 6.6L12 17.3 6.1 20.5l1.3-6.6L2.5 9.3l6.6-.8Z" fill="var(--gold)" stroke="#B9851A" stroke-width="1"/></svg>';
+function score(delta){
+  document.querySelectorAll('[data-score]').forEach(el => {
+    el.innerHTML = STAR + '<span>' + total() + '</span>';
+    if (!delta || el.offsetParent === null) return;
+    el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump');
+    const d = document.createElement('span');
+    d.className = 'delta ' + (delta > 0 ? 'plus' : 'minus');
+    d.textContent = (delta > 0 ? '+' : '−') + Math.abs(delta);
+    el.appendChild(d); setTimeout(() => d.remove(), 900);
+  });
+}
+function fb(el, ok, title, body, ref){
+  el.innerHTML = `<div class="feedback ${ok?'ok':'bad'}"><span class="ic">${ok?'✓':'✕'}</span><b></b><span></span><span class="ref"></span></div>`;
+  el.querySelector('b').textContent = title; el.querySelector('b + span').textContent = body; el.querySelector('.ref').textContent = ref || '';
+}
+
+/* ---------- Inicio ---------- */
+function hero(){
+  const w = $('#figHero'); w.innerHTML = figure();
+  const layers = [...w.querySelectorAll('.layer')];
+  if (reduced()) { layers.forEach(l => l.classList.add('on')); return; }
+  layers.forEach((l,i) => setTimeout(() => l.classList.add('on'), 250 + i*160));
+}
+hero();
+
+/* ---------- Ronda 1 ---------- */
+function startR1(){
+  $('#fig1').innerHTML = figure();
+  $('#fb1').innerHTML = '';
+  $('#next1').disabled = true;
+  const tray = $('#tray'); tray.innerHTML = '';
+  shuffle(PIECES).forEach(p => {
+    const b = document.createElement('button');
+    b.className = 'patch'; b.type = 'button';
+    b.innerHTML = '<i class="sw"></i><span></span><small></small>';
+    b.querySelector('.sw').style.background = p.c;
+    b.querySelector('span').textContent = p.n; b.querySelector('small').textContent = p.s;
+    b.addEventListener('click', () => pick(p, b));
+    tray.appendChild(b);
+  });
+  upd1(); score(); show('r1');
+}
+function pick(p, b){
+  if (b.disabled) return;
+  b.disabled = true;
+  if (p.ok){
+    const before = S.r1;
+    b.classList.add('done'); S.placed++; S.r1 = Math.max(0, S.placed*10 - S.wrong1*5);
+    $('#fig1').querySelector(`[data-l="${p.id}"]`).classList.add('on');
+    fb($('#fb1'), true, `¡Bien! ${p.n}`, p.why, p.ref);
+    score(S.r1 - before);
+  } else {
+    // Se lleva la cuenta de errores aparte para que equivocarse al inicio (con 0 pts) también cueste
+    const before = S.r1;
+    b.classList.add('wrong','shake'); S.wrong1++; S.r1 = Math.max(0, S.placed*10 - S.wrong1*5); buzz(60);
+    fb($('#fb1'), false, `${p.n} no va`, p.why, p.ref);
+    score(S.r1 - before);
+  }
+  upd1();
+  if (S.placed === NEED){
+    $('#next1').disabled = false;
+    $('#tray').querySelectorAll('.patch:not(.done):not(.wrong)').forEach(x => { x.disabled = true; x.classList.add('off'); });
+    fb($('#fb1'), true, '¡Uniforme completo!', 'Ya tienes las nueve prendas del uniforme de Rover. Ahora vamos con las insignias.', '');
+  }
+}
+function upd1(){ $('#count1').textContent = `${S.placed}/${NEED}`; $('#bar1').style.width = (S.placed/NEED*100)+'%'; }
+
+/* ---------- Ronda 2 ---------- */
+function startR2(){
+  $('#fig2').innerHTML = figure();
+  $('#fig2').querySelectorAll('.layer').forEach(l => l.classList.add('on'));
+  S.bi = 0; S.slot = {}; renderBadge(); show('r2');
+}
+function renderBadge(){
+  const b = S.badges[S.bi]; S.bTry = 0;
+  $('#r2n').textContent = `Insignia ${S.bi+1} de ${S.badges.length}`;
+  $('#r2t').textContent = b.n; $('#r2d').textContent = b.d;
+  const emb = $('#emb'); emb.innerHTML = ICON[b.i]; emb.style.animation = 'none'; void emb.offsetWidth; emb.style.animation = '';
+  $('#fb2').innerHTML = ''; $('#next2').hidden = true;
+  $('#bar2').style.width = (S.bi/S.badges.length*100)+'%';
+  $('#fig2').querySelectorAll('.zone').forEach(z => z.classList.remove('hit'));
+  const box = $('#zones'); box.innerHTML = '';
+  ZONES.forEach(z => {
+    const o = document.createElement('button'); o.className = 'opt'; o.type='button'; o.textContent = z.n; o.dataset.z = z.z;
+    o.addEventListener('click', () => place(z.z, o));
+    box.appendChild(o);
+  });
+  score();
+}
+function place(z, o){
+  const b = S.badges[S.bi];
+  const opts = [...$('#zones').children];
+  if (z === b.z){
+    const pts = S.bTry === 0 ? 10 : 5; S.r2 += pts;
+    o.classList.add('right'); opts.forEach(x => x.disabled = true);
+    fb($('#fb2'), true, S.bTry === 0 ? '¡Correcto!' : '¡Ahora sí!', b.why, b.ref);
+    score(pts); finishBadge();
+  } else {
+    o.classList.add('no','shake'); o.disabled = true; S.bTry++; buzz(60);
+    if (S.bTry >= 2){
+      opts.forEach(x => { x.disabled = true; if (x.dataset.z === b.z) x.classList.add('right'); });
+      fb($('#fb2'), false, `Va en: ${zName(b.z)}`, b.why, b.ref);
+      finishBadge();
+    } else {
+      fb($('#fb2'), false, 'Ahí no va', 'Te queda un intento, por 5 puntos.', '');
+    }
+  }
+}
+function finishBadge(){
+  const b = S.badges[S.bi];
+  const fig = $('#fig2');
+  fig.querySelector(`[data-z="${b.z}"]`).classList.add('hit');
+  // Dibuja la insignia en su lugar del maniquí, así se va llenando el uniforme
+  const n = S.slot[b.z] || 0; S.slot[b.z] = n + 1;
+  const list = SLOTS[b.z], [x, y, s] = list[Math.min(n, list.length-1)];
+  const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+  g.setAttribute('class','placed');
+  g.innerHTML = ICON[b.i].replace('<svg ', `<svg x="${x}" y="${y}" width="${s}" height="${s}" `);
+  fig.querySelector('.placed-layer').appendChild(g);
+  $('#bar2').style.width = ((S.bi+1)/S.badges.length*100)+'%';
+  $('#next2').textContent = S.bi === S.badges.length-1 ? 'Ir a la ronda 3' : 'Siguiente insignia';
+  $('#next2').hidden = false;
+}
+
+/* ---------- Ronda 3 ---------- */
+function startR3(){ S.qi = 0; renderQ(); show('r3'); }
+function renderQ(){
+  const q = S.qs[S.qi];
+  $('#r3n').textContent = `Pregunta ${S.qi+1} de ${S.qs.length}`;
+  $('#r3q').textContent = q.q; $('#fb3').innerHTML = ''; $('#next3').hidden = true;
+  $('#bar3').style.width = (S.qi/S.qs.length*100)+'%';
+  const box = $('#qopts'); box.innerHTML = '';
+  shuffle([q.a, ...q.w]).forEach((t, i) => {
+    const o = document.createElement('button'); o.className='opt'; o.type='button';
+    o.innerHTML = '<span class="k"></span><span class="t"></span>';
+    o.querySelector('.k').textContent = 'ABCD'[i]; o.querySelector('.t').textContent = t; o.dataset.t = t;
+    o.addEventListener('click', () => answer(t, o));
+    box.appendChild(o);
+  });
+  score();
+}
+function answer(t, o){
+  const q = S.qs[S.qi];
+  const opts = [...$('#qopts').children];
+  opts.forEach(x => { x.disabled = true; if (x.dataset.t === q.a) x.classList.add('right'); });
+  if (t === q.a){ S.r3 += 10; fb($('#fb3'), true, '¡Correcto!', q.why, q.ref); score(10); }
+  else { o.classList.add('no','shake'); buzz(60); fb($('#fb3'), false, 'No era esa', q.why, q.ref); }
+  $('#bar3').style.width = ((S.qi+1)/S.qs.length*100)+'%';
+  $('#next3').textContent = S.qi === S.qs.length-1 ? 'Ver mi resultado' : 'Siguiente pregunta';
+  $('#next3').hidden = false;
+}
+
+/* ---------- Final ---------- */
+function end(){
+  const t = total();
+  $('#endName').textContent = S.name ? `¡Listo, ${S.name}!` : '¡Listo!';
+  $('#b1').textContent = `${S.r1}/${MAX.r1}`; $('#b2').textContent = `${S.r2}/${MAX.r2}`; $('#b3').textContent = `${S.r3}/${MAX.r3}`;
+  ['bb1','bb2','bb3'].forEach(id => $('#'+id).style.width = '0');
+  const nStars = t >= 270 ? 3 : t >= 210 ? 2 : t >= 150 ? 1 : 0;
+  $('#endTitle').textContent = ['Toca repasar el reglamento','Vas por buen camino','Muy bien presentado','Uniforme impecable'][nStars];
+  $('#stars').innerHTML = [0,1,2].map(i => `<span class="${i<nStars?'on':''}" style="animation-delay:${.3+i*.2}s;opacity:${i<nStars?1:.25}">${STAR}</span>`).join('');
+  show('end');
+  setTimeout(() => { $('#bb1').style.width = (S.r1/MAX.r1*100)+'%'; $('#bb2').style.width = (S.r2/MAX.r2*100)+'%'; $('#bb3').style.width = (S.r3/MAX.r3*100)+'%'; }, 150);
+  const el = $('#endScore');
+  if (reduced()) el.textContent = t;
+  else { const t0 = performance.now(); const step = now => { const k = Math.min(1, (now-t0)/1000); el.textContent = Math.round(t*(1-Math.pow(1-k,3))); if (k<1) requestAnimationFrame(step); }; requestAnimationFrame(step); }
+  if (nStars >= 2) confetti();
+}
+function confetti(){
+  if (reduced()) return;
+  const colors = ['#C62334','#E9B949','#4F93CF','#2F7D4F','#1C2C4C'];
+  for (let i=0;i<70;i++){
+    const c = document.createElement('i'); c.className = 'confetti';
+    c.style.left = Math.random()*100 + 'vw';
+    c.style.background = colors[i % colors.length];
+    c.style.setProperty('--dx', (Math.random()*120-60)+'px');
+    c.style.setProperty('--r', (Math.random()*720-360)+'deg');
+    c.style.animationDuration = (1.8 + Math.random()*1.6) + 's';
+    c.style.animationDelay = (Math.random()*.5) + 's';
+    document.body.appendChild(c); setTimeout(() => c.remove(), 4200);
+  }
+}
+
+/* ---------- Guía ---------- */
+function buildGuide(){
+  const gp = $('#gPieces'); gp.innerHTML = '';
+  PIECES.filter(p=>p.ok).forEach(p => { const li=document.createElement('li'); li.innerHTML='<strong></strong> <span class="t"></span><span class="ref"></span>'; li.querySelector('strong').textContent=p.n+'.'; li.querySelector('.t').textContent=p.why; li.querySelector('.ref').textContent=p.ref; gp.appendChild(li); });
+  const gb = $('#gBadges'); gb.innerHTML = '';
+  BADGES.forEach(b => { const li=document.createElement('li'); li.innerHTML='<strong></strong> <span class="t"></span><span class="ref"></span>'; li.querySelector('strong').textContent=b.n+':'; li.querySelector('.t').textContent=b.why; li.querySelector('.ref').textContent=b.ref; gb.appendChild(li); });
+}
+buildGuide();
+
+/* ---------- Navegación ---------- */
+$('#start').addEventListener('click', () => { reset(); S.name = $('#name').value.trim(); store('rover-name', S.name); startR1(); });
+$('#next1').addEventListener('click', startR2);
+$('#next2').addEventListener('click', () => { if (S.bi < S.badges.length-1){ S.bi++; renderBadge(); window.scrollTo(0,0); } else startR3(); });
+$('#next3').addEventListener('click', () => { if (S.qi < S.qs.length-1){ S.qi++; renderQ(); window.scrollTo(0,0); } else end(); });
+$('#again').addEventListener('click', () => { show('home'); hero(); });
+$('#openGuide').addEventListener('click', () => { back='home'; show('guide'); });
+$('#guideEnd').addEventListener('click', () => { back='end'; show('guide'); });
+$('#closeGuide').addEventListener('click', () => show(back));
+})();
+</script>
+</body>
+</html>
